@@ -1,4 +1,4 @@
-use crate::{RispErr, RispExp};
+use crate::{error::RispErr, exp::RispExp};
 
 pub struct RispParser {}
 
@@ -43,7 +43,8 @@ impl RispParser {
 
 #[cfg(test)]
 mod parser_tests {
-    use crate::RispExp;
+
+    use crate::exp::RispExp;
 
     use super::RispParser;
 

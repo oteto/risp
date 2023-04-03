@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{RispErr, RispExp};
+use crate::{error::RispErr, exp::RispExp};
 
 #[derive(Clone)]
 pub struct RispEnv {

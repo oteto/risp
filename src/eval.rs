@@ -1,4 +1,4 @@
-use crate::{env::RispEnv, RispErr, RispExp};
+use crate::{env::RispEnv, error::RispErr, exp::RispExp};
 
 pub fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
     match exp {
