@@ -30,6 +30,26 @@ impl RispEnv {
                 Ok(RispExp::Number(*first - sum_of_rest))
             }),
         );
+        data.insert(
+            "=".to_string(),
+            RispExp::Func(crate::ensure_tonicity!(|a, b| a == b)),
+        );
+        data.insert(
+            ">".to_string(),
+            RispExp::Func(crate::ensure_tonicity!(|a, b| a > b)),
+        );
+        data.insert(
+            ">=".to_string(),
+            RispExp::Func(crate::ensure_tonicity!(|a, b| a >= b)),
+        );
+        data.insert(
+            "<".to_string(),
+            RispExp::Func(crate::ensure_tonicity!(|a, b| a < b)),
+        );
+        data.insert(
+            "<=".to_string(),
+            RispExp::Func(crate::ensure_tonicity!(|a, b| a <= b)),
+        );
         Self { data }
     }
 }
@@ -43,4 +63,24 @@ fn parse_single_float(exp: &RispExp) -> Result<f64, RispErr> {
         RispExp::Number(v) => Ok(*v),
         _ => Err(RispErr::Reason("expected a number".to_string())),
     }
+}
+
+#[macro_export]
+macro_rules! ensure_tonicity {
+    ($check_fn:expr) => {{
+        |args: &[RispExp]| -> Result<RispExp, RispErr> {
+            let floats = parse_list_of_floats(args)?;
+            let first = floats
+                .first()
+                .ok_or(RispErr::Reason("expected at latest one number".to_string()))?;
+            let rest = &floats[1..];
+            fn f(prev: &f64, xs: &[f64]) -> bool {
+                match xs.first() {
+                    Some(x) => $check_fn(prev, x) && f(x, &xs[1..]),
+                    None => true,
+                }
+            }
+            Ok(RispExp::Bool(f(first, rest)))
+        }
+    }};
 }

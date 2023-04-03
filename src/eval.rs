@@ -7,6 +7,7 @@ pub fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
             .get(s)
             .ok_or(RispErr::Reason(format!("unexpected symbol `{}`", s)))
             .map(|x| x.clone()),
+        RispExp::Bool(_) => Ok(exp.clone()),
         RispExp::Number(_) => Ok(exp.clone()),
         RispExp::List(list) => {
             let first_form = list

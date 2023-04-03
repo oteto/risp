@@ -33,10 +33,16 @@ impl RispParser {
     }
 
     fn parse_atom(token: &str) -> RispExp {
-        let potential_float = token.parse::<f64>();
-        match potential_float {
-            Ok(v) => RispExp::Number(v),
-            Err(_) => RispExp::Symbol(token.to_string()),
+        match token {
+            "true" => RispExp::Bool(true),
+            "false" => RispExp::Bool(false),
+            _ => {
+                let potential_float = token.parse::<f64>();
+                match potential_float {
+                    Ok(v) => RispExp::Number(v),
+                    Err(_) => RispExp::Symbol(token.to_string()),
+                }
+            }
         }
     }
 }
@@ -49,7 +55,7 @@ mod parser_tests {
     use super::RispParser;
 
     #[test]
-    fn test_parse() {
+    fn test_parse_add() {
         let tokens = vec!["(", "+", "10", "5", ")"]
             .iter()
             .map(|t| t.to_string())
@@ -64,6 +70,25 @@ mod parser_tests {
                     assert_eq!(s, "+");
                     assert_eq!(*a, 10.0);
                     assert_eq!(*b, 5.0);
+                }
+                _ => assert!(false),
+            },
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_parse_bool() {
+        let tokens = vec!["(", "true", "false", ")"]
+            .iter()
+            .map(|t| t.to_string())
+            .collect::<Vec<String>>();
+        let (exp, _) = RispParser::parse(&tokens).unwrap();
+        match exp {
+            RispExp::List(list) => match (&list[0], &list[1]) {
+                (RispExp::Bool(t), RispExp::Bool(f)) => {
+                    assert_eq!(*t, true);
+                    assert_eq!(*f, false);
                 }
                 _ => assert!(false),
             },
