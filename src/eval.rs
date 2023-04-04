@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use crate::{
     env::RispEnv,
@@ -113,8 +113,8 @@ fn eval_lambda_args(args: &[RispExp]) -> Result<RispExp, RispErr> {
         .ok_or(RispErr::Reason("expected body form".to_string()))?;
 
     Ok(RispExp::Lambda(RispLambda {
-        params_exp: Rc::new(params_form.clone()),
-        body_exp: Rc::new(body_exp.clone()),
+        params_exp: Box::new(params_form.clone()),
+        body_exp: Box::new(body_exp.clone()),
     }))
 }
 
@@ -123,7 +123,7 @@ fn eval_forms(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<Vec<RispExp>, 
 }
 
 fn env_for_lambda<'a>(
-    params: Rc<RispExp>,
+    params: Box<RispExp>,
     arg_forms: &[RispExp],
     outer_env: &'a mut RispEnv,
 ) -> Result<RispEnv<'a>, RispErr> {
@@ -148,7 +148,7 @@ fn env_for_lambda<'a>(
     })
 }
 
-fn parse_list_of_symbol_string(form: Rc<RispExp>) -> Result<Vec<String>, RispErr> {
+fn parse_list_of_symbol_string(form: Box<RispExp>) -> Result<Vec<String>, RispErr> {
     let list = match form.as_ref() {
         RispExp::List(s) => Ok(s.clone()),
         _ => Err(RispErr::Reason(

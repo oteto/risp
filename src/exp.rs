@@ -1,5 +1,4 @@
 use core::fmt;
-use std::rc::Rc;
 
 use crate::error::RispErr;
 
@@ -15,8 +14,8 @@ pub enum RispExp {
 
 #[derive(Clone)]
 pub struct RispLambda {
-    pub params_exp: Rc<RispExp>,
-    pub body_exp: Rc<RispExp>,
+    pub params_exp: Box<RispExp>,
+    pub body_exp: Box<RispExp>,
 }
 
 impl fmt::Display for RispExp {
