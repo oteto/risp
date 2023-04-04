@@ -95,4 +95,50 @@ mod parser_tests {
             _ => assert!(false),
         }
     }
+
+    #[test]
+    fn test_parse_fn() {
+        let tokens = vec![
+            "(", "fn", "add", "(", "a", "b", ")", "(", "+", "a", "b", ")", ")",
+        ]
+        .iter()
+        .map(|t| t.to_string())
+        .collect::<Vec<String>>();
+
+        let (exp, _) = RispParser::parse(&tokens).unwrap();
+        match exp {
+            RispExp::List(list) => {
+                match &list[0] {
+                    RispExp::Symbol(f) => assert_eq!(f, "fn"),
+                    _ => assert!(false),
+                }
+                match &list[1] {
+                    RispExp::Symbol(f) => assert_eq!(f, "add"),
+                    _ => assert!(false),
+                }
+                match &list[2] {
+                    RispExp::List(args) => match (&args[0], &args[1]) {
+                        (RispExp::Symbol(a), RispExp::Symbol(b)) => {
+                            assert_eq!(a, "a");
+                            assert_eq!(b, "b");
+                        }
+                        _ => assert!(false),
+                    },
+                    _ => assert!(false),
+                }
+                match &list[3] {
+                    RispExp::List(body) => match (&body[0], &body[1], &body[2]) {
+                        (RispExp::Symbol(o), RispExp::Symbol(a), RispExp::Symbol(b)) => {
+                            assert_eq!(o, "+");
+                            assert_eq!(a, "a");
+                            assert_eq!(b, "b");
+                        }
+                        _ => assert!(false),
+                    },
+                    _ => assert!(false),
+                }
+            }
+            _ => assert!(false),
+        }
+    }
 }

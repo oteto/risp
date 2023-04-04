@@ -3,11 +3,22 @@ use std::collections::HashMap;
 use crate::{error::RispErr, exp::RispExp};
 
 #[derive(Clone)]
-pub struct RispEnv {
+pub struct RispEnv<'a> {
     pub data: HashMap<String, RispExp>,
+    pub outer: Option<&'a RispEnv<'a>>,
 }
 
-impl RispEnv {
+impl<'a> RispEnv<'a> {
+    pub fn get(&self, key: &str) -> Option<RispExp> {
+        match self.data.get(key) {
+            Some(exp) => Some(exp.clone()),
+            None => match self.outer {
+                Some(outer_env) => outer_env.get(key),
+                None => None,
+            },
+        }
+    }
+
     pub fn default_env() -> Self {
         let mut data = HashMap::new();
         data.insert(
@@ -50,7 +61,7 @@ impl RispEnv {
             "<=".to_string(),
             RispExp::Func(crate::ensure_tonicity!(|a, b| a <= b)),
         );
-        Self { data }
+        Self { data, outer: None }
     }
 }
 

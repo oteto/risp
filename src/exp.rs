@@ -1,4 +1,5 @@
 use core::fmt;
+use std::rc::Rc;
 
 use crate::error::RispErr;
 
@@ -9,6 +10,13 @@ pub enum RispExp {
     Number(f64),
     List(Vec<RispExp>),
     Func(fn(&[RispExp]) -> Result<RispExp, RispErr>),
+    Lambda(RispLambda),
+}
+
+#[derive(Clone)]
+pub struct RispLambda {
+    pub params_exp: Rc<RispExp>,
+    pub body_exp: Rc<RispExp>,
 }
 
 impl fmt::Display for RispExp {
@@ -22,6 +30,7 @@ impl fmt::Display for RispExp {
                 format!("({})", xs.join(","))
             }
             RispExp::Func(_) => "Function {}".to_string(),
+            RispExp::Lambda(_) => "Lambda {}".to_string(),
         };
         write!(f, "{}", str)
     }
